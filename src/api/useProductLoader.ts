@@ -3,12 +3,13 @@ import { BapiClient } from '@aboutyou/backbone';
 import { APISortOrder } from '@aboutyou/backbone/endpoints/products/products';
 import { useAsyncLoader } from './useAsyncLoader';
 import { normalizeProduct } from './normalizeProduct';
+import { getAttributes } from '../utilities/getAttributes';
 
 const SHOP_ID = 605;
 const PORT = process.env.PORT || 9459;
 const HOST = `http://0.0.0.0:${PORT}/v1/`;
 
-export const useProductLoader = () => {
+export const useProductLoader = (selectedFilters) => {
   const bapi = new BapiClient({
     host: HOST,
     shopId: SHOP_ID,
@@ -20,6 +21,7 @@ export const useProductLoader = () => {
         .query({
           where: {
             categoryId: 20236,
+            attributes: getAttributes(selectedFilters),
           },
           pagination: {
             page: 1,
@@ -38,7 +40,7 @@ export const useProductLoader = () => {
           },
         })
         .then((data) => data.entities.map(normalizeProduct));
-    }, []),
+    }, [selectedFilters]),
   );
 
   return Array.isArray(products) ? products : [];
